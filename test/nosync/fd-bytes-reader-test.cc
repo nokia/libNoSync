@@ -12,6 +12,7 @@
 #include <nosync/fd-watching-event-loop-mock.h>
 #include <nosync/owned-fd.h>
 #include <nosync/ppoll-based-event-loop.h>
+#include <nosync/result-utils.h>
 #include <nosync/result.h>
 #include <string>
 #include <unistd.h>
@@ -25,7 +26,7 @@ using nosync::activity_handle_mock;
 using nosync::eclock;
 using nosync::fd_watch_mode;
 using nosync::fd_watching_event_loop_mock;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::make_ok_result;
 using nosync::make_fd_bytes_reader;
 using nosync::make_ppoll_based_event_loop;
@@ -123,7 +124,7 @@ TEST(NosyncFdBytesReader, TestTimeoutNew)
 //    test_evloop->run_iterations();
 
     ASSERT_EQ(saved_results.size(), 1U);
-    ASSERT_EQ(saved_results[0], make_timeout_error_result<string>());
+    ASSERT_EQ(saved_results[0], make_timeout_raw_error_result().as_result<string>());
 }
 
 
@@ -143,7 +144,7 @@ TEST(NosyncFdBytesReader, TestTimeout)
     test_evloop->run_iterations();
 
     ASSERT_EQ(saved_results.size(), 1U);
-    ASSERT_EQ(saved_results[0], make_timeout_error_result<string>());
+    ASSERT_EQ(saved_results[0], make_timeout_raw_error_result().as_result<string>());
 }
 
 

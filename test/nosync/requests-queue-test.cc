@@ -7,6 +7,7 @@
 #include <nosync/activity-handle-mock.h>
 #include <nosync/event-loop-mock.h>
 #include <nosync/requests-queue.h>
+#include <nosync/result-utils.h>
 #include <nosync/type-utils.h>
 #include <stdexcept>
 #include <string>
@@ -23,7 +24,7 @@ using nosync::event_loop_mock;
 using nosync::make_copy;
 using nosync::make_error_result;
 using nosync::make_ok_result;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::requests_queue;
 using nosync::result;
 using std::errc;
@@ -136,7 +137,7 @@ TEST(NosyncRequestsQueue, RequestTimeout)
     saved_timeout_task();
 
     ASSERT_EQ(results.size(), 1U);
-    ASSERT_EQ(results.front(), make_timeout_error_result<string>());
+    ASSERT_EQ(results.front(), make_timeout_raw_error_result().as_result<string>());
 }
 
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <nosync/bytes-reader-mock.h>
 #include <nosync/event-loop-mock.h>
+#include <nosync/result-utils.h>
 #include <nosync/result.h>
 #include <nosync/time-limited-bytes-reader.h>
 #include <string>
@@ -20,7 +21,7 @@ using nosync::eclock;
 using nosync::event_loop_mock;
 using nosync::make_ok_result;
 using nosync::make_time_limited_bytes_reader;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::result;
 using std::function;
 using std::get;
@@ -93,9 +94,9 @@ TEST(NosyncTimeLimitedBytesReader, TestSimple)
     ASSERT_EQ(saved_result_handlers.size(), 1U);
     ASSERT_EQ(get<size_t>(saved_result_handlers.front()), 4U);
     ASSERT_EQ(get<ch::nanoseconds>(saved_result_handlers.front()), 0ns);
-    get<function<void(result<string>)>>(saved_result_handlers.front())(make_timeout_error_result<string>());
+    get<function<void(result<string>)>>(saved_result_handlers.front())(make_timeout_raw_error_result().as_result<string>());
     ASSERT_EQ(results.size(), 1U);
-    ASSERT_EQ(results.front(), make_timeout_error_result<string>());
+    ASSERT_EQ(results.front(), make_timeout_raw_error_result().as_result<string>());
     saved_result_handlers.clear();
     results.clear();
 }

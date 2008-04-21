@@ -5,6 +5,7 @@
 #include <nosync/bytes-reader-mock.h>
 #include <nosync/bytes-writer-mock.h>
 #include <nosync/reader-writer-bytes-io.h>
+#include <nosync/result-utils.h>
 #include <nosync/type-utils.h>
 #include <string>
 #include <utility>
@@ -17,7 +18,7 @@ using nosync::bytes_writer_mock;
 using nosync::make_copy;
 using nosync::make_ok_result;
 using nosync::make_reader_writer_bytes_io;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::result;
 using std::function;
 using std::make_shared;
@@ -88,7 +89,7 @@ TEST(NosyncReaderWriterBytesIo, TestWrite)
     ASSERT_EQ(saved_write_results.size(), 0U);
     ASSERT_EQ(saved_write_res_handlers.size(), 1U);
 
-    const auto test_result = make_timeout_error_result<void>();
+    const auto test_result = make_timeout_raw_error_result().as_result<void>();
 
     saved_write_res_handlers.front()(test_result);
     ASSERT_EQ(saved_write_results.size(), 1U);

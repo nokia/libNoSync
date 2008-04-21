@@ -9,7 +9,6 @@
 
 using namespace std::string_literals;
 using nosync::make_error_result;
-using nosync::make_timeout_error_result;
 using nosync::make_ok_result;
 using std::add_const_t ;
 using std::errc;
@@ -23,16 +22,6 @@ TEST(NosyncResult, UseWithError)
 {
     auto ec = make_error_code(errc::interrupted);
     auto res = make_error_result<string>(ec);
-    ASSERT_FALSE(res.is_ok());
-    ASSERT_EQ(res.get_error(), ec);
-    ASSERT_THROW(res.get_value(), std::logic_error);
-}
-
-
-TEST(NosyncResult, UseWithTimeoutError)
-{
-    auto ec = make_error_code(errc::timed_out);
-    auto res = make_timeout_error_result<string>();
     ASSERT_FALSE(res.is_ok());
     ASSERT_EQ(res.get_error(), ec);
     ASSERT_THROW(res.get_value(), std::logic_error);
@@ -100,15 +89,6 @@ TEST(NosyncResult, UseVoidWithError)
 {
     auto ec = make_error_code(errc::interrupted);
     auto res = make_error_result<void>(ec);
-    ASSERT_FALSE(res.is_ok());
-    ASSERT_EQ(res.get_error(), ec);
-}
-
-
-TEST(NosyncResult, UseVoidWithTimeoutError)
-{
-    auto ec = make_error_code(errc::timed_out);
-    auto res = make_timeout_error_result<void>();
     ASSERT_FALSE(res.is_ok());
     ASSERT_EQ(res.get_error(), ec);
 }

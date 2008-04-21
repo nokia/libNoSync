@@ -9,6 +9,7 @@
 #include <nosync/event-loop.h>
 #include <nosync/lines-reader.h>
 #include <nosync/manual-event-loop.h>
+#include <nosync/result-utils.h>
 #include <nosync/result.h>
 #include <string>
 #include <system_error>
@@ -23,7 +24,7 @@ using nosync::make_const_bytes_reader;
 using nosync::make_error_result;
 using nosync::make_lines_reader;
 using nosync::make_ok_result;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::request_handler;
 using nosync::result;
 using std::errc;
@@ -221,7 +222,7 @@ TEST(NosyncLinesReader, Timeout)
                 evloop->invoke_at(
                     evloop->get_etime() + timeout,
                     [result_handler = move(result_handler)]() {
-                        result_handler(make_timeout_error_result<string>());
+                        result_handler(make_timeout_raw_error_result().as_result<string>());
                     });
             }
         }));
@@ -241,5 +242,5 @@ TEST(NosyncLinesReader, Timeout)
 
     ASSERT_EQ(saved_results.size(), 2U);
     ASSERT_EQ(saved_results[0], make_ok_result(""s));
-    ASSERT_EQ(saved_results[1], make_timeout_error_result<string>());
+    ASSERT_EQ(saved_results[1], make_timeout_raw_error_result().as_result<string>());
 }

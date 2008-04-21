@@ -6,6 +6,7 @@
 #include <nosync/func-request-handler.h>
 #include <nosync/input-messages-dispatch-handler.h>
 #include <nosync/manual-event-loop.h>
+#include <nosync/result-utils.h>
 #include <nosync/result.h>
 #include <string>
 #include <tuple>
@@ -18,7 +19,7 @@ using nosync::manual_event_loop;
 using nosync::make_func_request_handler;
 using nosync::make_input_messages_dispatch_handler;
 using nosync::make_ok_result;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::request_handler;
 using nosync::result;
 using std::deque;
@@ -88,7 +89,7 @@ TEST(NosyncInputMessagesDispatchHandler, MultipleRequests)
                 evloop->invoke_at(
                     evloop->get_etime() + timeout,
                     [&input_msgs, res_handler = move(res_handler)]() {
-                        res_handler(make_timeout_error_result<string>());
+                        res_handler(make_timeout_raw_error_result().as_result<string>());
                     });
             }
         });
@@ -120,5 +121,5 @@ TEST(NosyncInputMessagesDispatchHandler, MultipleRequests)
     ASSERT_EQ(saved_results[0], make_tuple(1U, make_ok_result("1abc"s)));
     ASSERT_EQ(saved_results[1], make_tuple(2U, make_ok_result("2de"s)));
     ASSERT_EQ(saved_results[2], make_tuple(4U, make_ok_result("4jklmn"s)));
-    ASSERT_EQ(saved_results[3], make_tuple(5U, make_timeout_error_result<string>()));
+    ASSERT_EQ(saved_results[3], make_tuple(5U, make_timeout_raw_error_result().as_result<string>()));
 }

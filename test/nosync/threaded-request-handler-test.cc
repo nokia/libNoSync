@@ -8,6 +8,7 @@
 #include <nosync/event-loop.h>
 #include <nosync/ppoll-based-event-loop.h>
 #include <nosync/request-handler.h>
+#include <nosync/result-utils.h>
 #include <nosync/thread-pool-executor.h>
 #include <nosync/threaded-request-handler.h>
 #include <nosync/type-utils.h>
@@ -21,7 +22,7 @@ using namespace std::chrono_literals;
 using namespace std::string_literals;
 using nosync::result;
 using nosync::make_copy;
-using nosync::make_timeout_error_result;
+using nosync::make_timeout_raw_error_result;
 using nosync::make_ok_result;
 using nosync::make_event_loop_based_mt_executor;
 using nosync::make_ppoll_based_event_loop;
@@ -89,7 +90,7 @@ TEST(NosyncThreadedRequestHandler, CheckHandlerResults)
         make_copy(evloop_mt_executor), make_thread_pool_executor(1),
         [calculation_time](auto request, auto timeout) {
             if (timeout < calculation_time) {
-                return make_timeout_error_result<size_t>();
+                return make_timeout_raw_error_result().as_result<size_t>();
             }
 
             std::this_thread::sleep_for(calculation_time);
@@ -120,7 +121,7 @@ TEST(NosyncThreadedRequestHandler, CheckHandlerResults)
     evloop->run_iterations();
 
     ASSERT_EQ(saved_results.size(), 2U);
-    ASSERT_EQ(saved_results[0], make_timeout_error_result<size_t>());
+    ASSERT_EQ(saved_results[0], make_timeout_raw_error_result().as_result<size_t>());
     ASSERT_EQ(saved_results[1], make_ok_result(test_string.size()));
 }
 
