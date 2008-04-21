@@ -35,6 +35,9 @@ public:
     explicit raw_error_result(const result<T> &res);
 
     template<typename T>
+    result<T> as_result() const;
+
+    template<typename T>
     operator result<T>() const;
 
 private:

@@ -26,9 +26,16 @@ raw_error_result::raw_error_result(const result<T> &res)
 
 
 template<typename T>
-raw_error_result::operator result<T>() const
+result<T> raw_error_result::as_result() const
 {
     return result<T>::create_with_error(ec);
+}
+
+
+template<typename T>
+raw_error_result::operator result<T>() const
+{
+    return as_result<T>();
 }
 
 }
