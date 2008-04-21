@@ -111,10 +111,4 @@ shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watcher &watcher, shared_fd &&f
     return make_shared<fd_bytes_writer>(watcher, move(fd));
 }
 
-
-shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd)
-{
-    return make_shared<fd_bytes_writer>(static_cast<fd_watcher &>(evloop), move(fd));
-}
-
 }

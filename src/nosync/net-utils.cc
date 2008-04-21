@@ -475,24 +475,4 @@ result<owned_fd> open_local_abstract_listening_stream_socket(const string &abstr
         : raw_error_result(addr_res);
 }
 
-
-string make_ipv4_localhost_socket_addr_bytes(uint16_t port)
-{
-    const auto addr = make_ipv4_socket_address(INADDR_LOOPBACK, port);
-    socket_address_view addr_view = addr->get_view();
-
-    return string(reinterpret_cast<const char *>(addr_view.addr), addr_view.addr_size);
-}
-
-
-result<owned_fd> open_connected_datagram_socket(int, const string &addr_bytes)
-{
-    ::sockaddr_storage addr;
-    std::memcpy(&addr, addr_bytes.data(), addr_bytes.size());
-
-    socket_address_view addr_view = {reinterpret_cast<const sockaddr *>(&addr), addr_bytes.size()};
-
-    return open_connected_datagram_socket(addr_view);
-}
-
 }

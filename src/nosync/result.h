@@ -88,9 +88,6 @@ result<T> make_error_result(std::error_code ec);
 template<typename T>
 result<T> make_error_result(std::errc e);
 
-template<typename T>
-result<T> make_timeout_error_result();
-
 
 bool operator==(const result<void> &lhs, const result<void> &rhs);
 

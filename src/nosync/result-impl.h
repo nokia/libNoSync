@@ -144,13 +144,6 @@ result<T> make_error_result(std::errc e)
     return result<T>::create_with_error(std::make_error_code(e));
 }
 
-
-template<typename T>
-result<T> make_timeout_error_result()
-{
-    return result<T>::create_with_error(std::make_error_code(std::errc::timed_out));
-}
-
 }
 
 #endif /* NOSYNC__RESULT_IMPL_H */

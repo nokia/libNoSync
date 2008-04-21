@@ -48,9 +48,6 @@ result<void> connect_local_socket_to_abstract_path(int sock_fd, const std::strin
 result<owned_fd> open_local_abstract_connected_stream_socket(const std::string &abstract_path);
 result<owned_fd> open_local_abstract_listening_stream_socket(const std::string &abstract_path, int conn_backlog_size);
 
-std::string make_ipv4_localhost_socket_addr_bytes(std::uint16_t port);
-result<owned_fd> open_connected_datagram_socket(int domain, const std::string &addr_bytes);
-
 }
 
 #endif /* NOSYNC__NET_UTILS_H */

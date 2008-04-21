@@ -4,15 +4,12 @@
 
 #include <nosync/bytes-writer.h>
 #include <nosync/fd-watcher.h>
-#include <nosync/fd-watching-event-loop.h>
 #include <nosync/shared-fd.h>
 #include <memory>
 
 
 namespace nosync
 {
-
-std::shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd);
 
 std::shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watcher &watcher, shared_fd &&fd);
 
