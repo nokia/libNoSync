@@ -5,6 +5,7 @@
 
 using nosync::sizeof_in_atoms;
 using nosync::sizeof_in_bits;
+using nosync::sizeof_sum;
 using std::int16_t;
 using std::int32_t;
 using std::int64_t;
@@ -42,4 +43,13 @@ TEST(NosyncTypeUtils, SizeofInBits) {
     ASSERT_EQ(sizeof_in_bits<int32_t>, 32U);
     ASSERT_EQ(sizeof_in_bits<int16_t>, 16U);
     ASSERT_EQ(sizeof_in_bits<int8_t>, 8U);
+}
+
+
+TEST(NosyncTypeUtils, SizeofSum) {
+    ASSERT_EQ((sizeof_sum<>), 0U);
+    ASSERT_EQ((sizeof_sum<char>), 1U);
+    ASSERT_EQ((sizeof_sum<uint32_t>), 4U);
+    ASSERT_EQ((sizeof_sum<char, uint32_t, char>), 6U);
+    ASSERT_EQ((sizeof_sum<uint16_t, char, uint64_t, uint32_t>), 15U);
 }
