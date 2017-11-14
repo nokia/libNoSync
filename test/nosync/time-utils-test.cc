@@ -10,6 +10,7 @@ using nosync::make_duration_from_timespec;
 using nosync::make_duration_from_timeval;
 using nosync::make_timespec_from_duration;
 using nosync::make_timeval_from_duration;
+using nosync::time_point_sat_add;
 using nosync::to_float_seconds;
 
 
@@ -79,4 +80,43 @@ TEST(NosyncTimeUtils, ToFloatSeconds)
 
     EXPECT_FLOAT_EQ(to_float_seconds(250ms), 0.25);
     EXPECT_FLOAT_EQ(to_float_seconds(-500ms), -0.5);
+}
+
+
+TEST(NosyncTimeUtils, TestTimePointSatAddBasic)
+{
+    using time_point = ch::time_point<ch::steady_clock>;
+
+    ASSERT_EQ(time_point_sat_add(time_point::max(), 0ns), time_point::max());
+    ASSERT_EQ(time_point_sat_add(time_point::max() - 20s, 10s), time_point::max() - 10s);
+    ASSERT_EQ(time_point_sat_add(time_point(1000s), 10s), time_point(1010s));
+
+    ASSERT_EQ(time_point_sat_add(time_point::min(), 0ns), time_point::min());
+    ASSERT_EQ(time_point_sat_add(time_point::min() + 20s, -10s), time_point::min() + 10s);
+    ASSERT_EQ(time_point_sat_add(time_point(-1000s), -10s), time_point(-1010s));
+
+    ASSERT_LT(time_point_sat_add(time_point::max(), -1ns), time_point::max());
+    ASSERT_GT(time_point_sat_add(time_point::min(), 1ns), time_point::min());
+}
+
+
+TEST(NosyncTimeUtils, TestTimePointSatAddWithOverflow)
+{
+    using time_point = ch::time_point<ch::steady_clock>;
+
+    ASSERT_EQ(time_point_sat_add(time_point::max(), 1ns), time_point::max());
+    ASSERT_EQ(time_point_sat_add(time_point::max() - 20s, 30s), time_point::max());
+    ASSERT_EQ(time_point_sat_add(time_point(1000s), ch::nanoseconds::max()), time_point::max());
+    ASSERT_EQ(time_point_sat_add(time_point::max(), ch::nanoseconds::max()), time_point::max());
+}
+
+
+TEST(NosyncTimeUtils, TestTimePointSatAddWithUnderflow)
+{
+    using time_point = ch::time_point<ch::steady_clock>;
+
+    ASSERT_EQ(time_point_sat_add(time_point::min(), -1ns), time_point::min());
+    ASSERT_EQ(time_point_sat_add(time_point::min() + 20s, -30s), time_point::min());
+    ASSERT_EQ(time_point_sat_add(time_point(-1000s), ch::nanoseconds::min()), time_point::min());
+    ASSERT_EQ(time_point_sat_add(time_point::min(), ch::nanoseconds::min()), time_point::min());
 }

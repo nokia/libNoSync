@@ -44,6 +44,9 @@ std::string format_time_to_localtime_microseconds_tz(std::chrono::time_point<std
 std::string format_time_to_gmtime_seconds(std::chrono::time_point<std::chrono::system_clock> time);
 std::string format_time_to_gmtime_microseconds(std::chrono::time_point<std::chrono::system_clock> time);
 
+template<class Clock, class Duration>
+std::chrono::time_point<Clock> time_point_sat_add(std::chrono::time_point<Clock> time, Duration delta);
+
 }
 
 #include <nosync/time-utils-impl.h>
