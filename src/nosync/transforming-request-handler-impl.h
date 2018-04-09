@@ -104,10 +104,7 @@ void transforming_request_handler<InReq, OutReq, Res>::handle_request(
     auto req_trans_res = req_transformer(move(request));
     if (req_trans_res.is_ok()) {
         base_req_handler->handle_request(
-            move(req_trans_res.get_value()), timeout,
-            [response_handler = move(response_handler)](auto res) {
-                response_handler(move(res));
-            });
+            move(req_trans_res.get_value()), timeout, move(response_handler));
     } else {
         invoke_result_handler_later(
             evloop, move(response_handler), raw_error_result(req_trans_res));
