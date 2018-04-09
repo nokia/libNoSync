@@ -146,6 +146,14 @@ void invoke_result_handler_later_via_bytes_reader(
         });
 }
 
+
+template<typename Res, typename ResultLike>
+void invoke_result_handler_later_via_bytes_reader(
+    bytes_reader &reader, result_handler<Res> &&res_handler, const ResultLike &res)
+{
+    invoke_result_handler_later_via_bytes_reader(reader, std::move(res_handler), result<Res>(res));
+}
+
 }
 
 #endif /* NOSYNC__BYTES_READER_UTILS_IMPL_H */

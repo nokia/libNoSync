@@ -57,6 +57,10 @@ template<typename Res>
 void invoke_result_handler_later_via_bytes_reader(
     bytes_reader &reader, result_handler<Res> &&res_handler, result<Res> &&res);
 
+template<typename Res, typename ResultLike>
+void invoke_result_handler_later_via_bytes_reader(
+    bytes_reader &reader, result_handler<Res> &&res_handler, const ResultLike &res);
+
 }
 
 #include <nosync/bytes-reader-utils-impl.h>

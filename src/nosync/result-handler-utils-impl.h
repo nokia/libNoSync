@@ -21,6 +21,15 @@ void invoke_result_handler_at(
 }
 
 
+template<typename T, typename ResultLike>
+void invoke_result_handler_at(
+    event_loop &evloop, std::chrono::time_point<eclock> time,
+    result_handler<T> &&res_handler, const ResultLike &res)
+{
+    return invoke_result_handler_at(evloop, time, std::move(res_handler), result<T>(res));
+}
+
+
 template<typename T>
 void invoke_result_handler_later(event_loop &evloop, result_handler<T> &&res_handler, result<T> &&res)
 {
@@ -29,6 +38,13 @@ void invoke_result_handler_later(event_loop &evloop, result_handler<T> &&res_han
         [res_handler = std::move(res_handler), res = std::move(res)]() mutable {
             res_handler(std::move(res));
         });
+}
+
+
+template<typename T, typename ResultLike>
+void invoke_result_handler_later(event_loop &evloop, result_handler<T> &&res_handler, const ResultLike &res)
+{
+    return invoke_result_handler_later(evloop, std::move(res_handler), result<T>(res));
 }
 
 }
