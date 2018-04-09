@@ -71,8 +71,7 @@ void size_limited_bytes_reader::read_some_bytes(
     }
     if (remaining_size_limit == 0) {
         invoke_result_handler_later_via_bytes_reader(
-            *base_reader, move(res_handler),
-            make_error_result<string>(errc::file_too_large));
+            *base_reader, move(res_handler), raw_error_result(errc::file_too_large));
         return;
     }
 

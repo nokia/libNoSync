@@ -2,6 +2,7 @@
 #ifndef NOSYNC__TRANSFORMING_REQUEST_HANDLER_IMPL_H
 #define NOSYNC__TRANSFORMING_REQUEST_HANDLER_IMPL_H
 
+#include <nosync/raw-error-result.h>
 #include <nosync/result-handler-utils.h>
 
 
@@ -60,7 +61,7 @@ void full_transforming_request_handler<InReq, OutReq, InRes, OutRes>::handle_req
                 }));
     } else {
         invoke_result_handler_later(
-            evloop, move(response_handler), make_error_result<OutRes>(req_trans_res.get_error()));
+            evloop, move(response_handler), raw_error_result(req_trans_res));
     }
 }
 
@@ -109,7 +110,7 @@ void transforming_request_handler<InReq, OutReq, Res>::handle_request(
             });
     } else {
         invoke_result_handler_later(
-            evloop, move(response_handler), make_error_result<Res>(req_trans_res.get_error()));
+            evloop, move(response_handler), raw_error_result(req_trans_res));
     }
 }
 
