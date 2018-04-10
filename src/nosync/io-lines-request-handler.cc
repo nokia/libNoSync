@@ -130,9 +130,7 @@ void io_lines_request_handler::handle_request(
     result_handler<string> &&res_handler)
 {
     if (data.find('\n') != string::npos) {
-        invoke_result_handler_later(
-            evloop, move(res_handler),
-            make_error_result<string>(errc::invalid_argument));
+        invoke_result_handler_later(evloop, move(res_handler), raw_error_result(errc::invalid_argument));
         return;
     }
 

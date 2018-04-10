@@ -13,6 +13,7 @@
 #include <nosync/io-utils.h>
 #include <nosync/owned-fd.h>
 #include <nosync/piped-command.h>
+#include <nosync/raw-error-result.h>
 #include <nosync/reader-writer-bytes-io.h>
 #include <nosync/result-handler-utils.h>
 #include <nosync/shared-fd.h>
@@ -48,14 +49,12 @@ tuple<::pid_t, shared_ptr<bytes_io>> make_failed_start_command_result(event_loop
             make_func_bytes_reader(
                 [&evloop](auto, auto, auto res_handler) {
                     invoke_result_handler_later(
-                        evloop, move(res_handler),
-                        make_error_result<string>(errc::no_child_process));
+                        evloop, move(res_handler), raw_error_result(errc::no_child_process));
                 }),
             make_func_bytes_writer(
                 [&evloop](auto, auto res_handler) {
                     invoke_result_handler_later(
-                        evloop, move(res_handler),
-                        make_error_result<void>(errc::no_child_process));
+                        evloop, move(res_handler), raw_error_result(errc::no_child_process));
                 }))
     };
 }
