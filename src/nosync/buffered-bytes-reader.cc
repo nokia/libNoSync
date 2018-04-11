@@ -3,6 +3,7 @@
 #include <deque>
 #include <functional>
 #include <nosync/buffered-bytes-reader.h>
+#include <nosync/bytes-reader-utils.h>
 #include <nosync/memory-utils.h>
 #include <string>
 #include <utility>
@@ -55,11 +56,8 @@ void buffered_bytes_reader::read_some_bytes(
         const auto chunk_size = std::min(buffer.size(), max_size);
         auto chunk = string(buffer.cbegin(), buffer.cbegin() + chunk_size);
         buffer.erase(buffer.begin(), buffer.begin() + chunk_size);
-        base_reader->read_some_bytes(
-            0U, ch::nanoseconds::max(),
-            [res_handler = move(res_handler), chunk = move(chunk)](auto) mutable {
-                res_handler(make_ok_result(move(chunk)));
-            });
+        invoke_result_handler_later_via_bytes_reader(
+            *base_reader, move(res_handler), make_ok_result(move(chunk)));
     } else if (max_size >= max_buffer_size) {
         base_reader->read_some_bytes(max_size, timeout, move(res_handler));
     } else {

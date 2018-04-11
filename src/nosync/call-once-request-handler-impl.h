@@ -3,6 +3,7 @@
 #define NOSYNC__CALL_ONCE_REQUEST_HANDLER_IMPL_H
 
 #include <nosync/func-request-handler.h>
+#include <nosync/raw-error-result.h>
 
 
 namespace nosync
@@ -23,7 +24,7 @@ std::shared_ptr<request_handler<Req, Res>> make_call_once_request_handler(
                 tmp_req_handler->handle_request(move(req), timeout, move(res_handler));
             } else {
                 invoke_result_handler_later(
-                    evloop, move(res_handler), make_error_result<Res>(other_calls_error));
+                    evloop, move(res_handler), raw_error_result(other_calls_error));
             }
         });
 

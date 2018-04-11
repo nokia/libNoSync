@@ -70,16 +70,16 @@ void threaded_request_handler<Req, Res>::handle_request(
     Req &&request, std::chrono::nanoseconds timeout, result_handler<Res> &&response_handler)
 {
     thread_executor(
-        [exec_ctx = exec_ctx, request = std::move(request), timeout, response_handler = std::move(response_handler)]() mutable {
-            result<Res> response = raw_error_result(std::error_code());
+        [exec_ctx = exec_ctx, request = std::make_shared<Req>(std::move(request)), timeout, response_handler = std::move(response_handler)]() mutable {
+            std::shared_ptr<result<Res>> response;
             try {
-                response = exec_ctx->sync_req_handler(std::move(request), timeout);
+                response = std::make_shared<result<Res>>(exec_ctx->sync_req_handler(std::move(*request), timeout));
             } catch (...) {
-                response = raw_error_result(std::errc::owner_dead);
+                response = std::make_shared<result<Res>>(raw_error_result(std::errc::owner_dead));
             }
             exec_ctx->evloop_executor(
                 [response_handler = std::move(response_handler), response = std::move(response)]() mutable {
-                    response_handler(std::move(response));
+                    response_handler(std::move(*response));
                 });
         });
 }
