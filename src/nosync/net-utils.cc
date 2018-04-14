@@ -209,8 +209,10 @@ result<int> get_socket_type(int sock_fd)
     socklen_t result_size = sizeof(type);
     int sockopt_retval = getsockopt(sock_fd, SOL_SOCKET, SO_TYPE, &type, &result_size);
 
-    return sockopt_retval == 0 && result_size == sizeof(type)
-        ? make_ok_result(type)
+    return sockopt_retval == 0
+        ? result_size == sizeof(type)
+            ? make_ok_result(type)
+            : raw_error_result(errc::message_size)
         : make_raw_error_result_from_errno();
 }
 
