@@ -40,6 +40,7 @@ public:
     un_socket_address(const un_socket_address &) = default;
     un_socket_address(un_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -56,6 +57,7 @@ public:
     in_socket_address(const in_socket_address &) = default;
     in_socket_address(in_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -71,6 +73,7 @@ public:
     any_socket_address(const any_socket_address &) = default;
     any_socket_address(any_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -82,6 +85,12 @@ private:
 un_socket_address::un_socket_address(const ::sockaddr_un &addr, size_t addr_size)
     : addr(addr), addr_size(addr_size)
 {
+}
+
+
+int un_socket_address::get_address_family() const
+{
+    return AF_UNIX;
 }
 
 
@@ -97,15 +106,29 @@ in_socket_address::in_socket_address(const ::sockaddr_in &addr)
 }
 
 
+int in_socket_address::get_address_family() const
+{
+    return AF_INET;
+}
+
+
 socket_address_view in_socket_address::get_view() const
 {
     return {reinterpret_cast<const ::sockaddr *>(&addr), sizeof(addr)};
 }
 
 
+
+
 any_socket_address::any_socket_address(const ::sockaddr_storage &addr, size_t addr_size)
     : addr(addr), addr_size(addr_size)
 {
+}
+
+
+int any_socket_address::get_address_family() const
+{
+    return addr.ss_family;
 }
 
 
