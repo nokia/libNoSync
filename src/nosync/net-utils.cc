@@ -372,7 +372,7 @@ result<tuple<unique_ptr<socket_address>, string>> receive_datagram_via_socket(in
     auto data_buf = make_unique<char[]>(max_data_size + 1);
 
     ssize_t recv_retval = ::recvfrom(
-        sock_fd, data_buf.get(), max_data_size, 0, reinterpret_cast<sockaddr *>(&src_addr), &src_addr_size);
+        sock_fd, data_buf.get(), max_data_size + 1, 0, reinterpret_cast<sockaddr *>(&src_addr), &src_addr_size);
     if (recv_retval < 0) {
         return make_raw_error_result_from_errno();
     }
