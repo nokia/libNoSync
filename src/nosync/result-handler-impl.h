@@ -103,7 +103,7 @@ result_handler<void> result_handler_transformer<void, OutType, F>::operator()(
 template<typename InType, typename OutType, typename F>
 result_handler<InType> transform_result_handler(result_handler<OutType> &&base_res_handler, F &&trans_func)
 {
-    return result_handler_impl::result_handler_transformer<InType, OutType, F>()(move(base_res_handler), std::forward<F>(trans_func));
+    return result_handler_impl::result_handler_transformer<InType, OutType, F>()(std::move(base_res_handler), std::forward<F>(trans_func));
 }
 
 
