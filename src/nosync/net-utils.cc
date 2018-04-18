@@ -40,6 +40,7 @@ public:
     un_socket_address(const un_socket_address &) = default;
     un_socket_address(un_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -56,6 +57,7 @@ public:
     in_socket_address(const in_socket_address &) = default;
     in_socket_address(in_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -71,6 +73,7 @@ public:
     any_socket_address(const any_socket_address &) = default;
     any_socket_address(any_socket_address &&) = default;
 
+    int get_address_family() const override;
     socket_address_view get_view() const override;
 
 private:
@@ -82,6 +85,12 @@ private:
 un_socket_address::un_socket_address(const ::sockaddr_un &addr, size_t addr_size)
     : addr(addr), addr_size(addr_size)
 {
+}
+
+
+int un_socket_address::get_address_family() const
+{
+    return AF_UNIX;
 }
 
 
@@ -97,15 +106,29 @@ in_socket_address::in_socket_address(const ::sockaddr_in &addr)
 }
 
 
+int in_socket_address::get_address_family() const
+{
+    return AF_INET;
+}
+
+
 socket_address_view in_socket_address::get_view() const
 {
     return {reinterpret_cast<const ::sockaddr *>(&addr), sizeof(addr)};
 }
 
 
+
+
 any_socket_address::any_socket_address(const ::sockaddr_storage &addr, size_t addr_size)
     : addr(addr), addr_size(addr_size)
 {
+}
+
+
+int any_socket_address::get_address_family() const
+{
+    return addr.ss_family;
 }
 
 
@@ -205,13 +228,7 @@ result<void> bind_socket(int sock_fd, socket_address_view addr)
 
 result<int> get_socket_type(int sock_fd)
 {
-    int type;
-    socklen_t result_size = sizeof(type);
-    int sockopt_retval = getsockopt(sock_fd, SOL_SOCKET, SO_TYPE, &type, &result_size);
-
-    return sockopt_retval == 0 && result_size == sizeof(type)
-        ? make_ok_result(type)
-        : make_raw_error_result_from_errno();
+    return get_socket_int_option(sock_fd, SOL_SOCKET, SO_TYPE);
 }
 
 }
@@ -372,7 +389,7 @@ result<tuple<unique_ptr<socket_address>, string>> receive_datagram_via_socket(in
     auto data_buf = make_unique<char[]>(max_data_size + 1);
 
     ssize_t recv_retval = ::recvfrom(
-        sock_fd, data_buf.get(), max_data_size, 0, reinterpret_cast<sockaddr *>(&src_addr), &src_addr_size);
+        sock_fd, data_buf.get(), max_data_size + 1, 0, reinterpret_cast<sockaddr *>(&src_addr), &src_addr_size);
     if (recv_retval < 0) {
         return make_raw_error_result_from_errno();
     }
@@ -404,6 +421,20 @@ bool is_datagram_socket(int sock_fd)
 {
     auto sock_type = get_socket_type(sock_fd);
     return sock_type.is_ok() && sock_type.get_value() == SOCK_DGRAM;
+}
+
+
+result<int> get_socket_int_option(int sock_fd, int level, int opt_name)
+{
+    int opt_value;
+    ::socklen_t opt_value_size = sizeof(opt_value);
+    int sockopt_retval = ::getsockopt(sock_fd, level, opt_name, &opt_value, &opt_value_size);
+
+    return sockopt_retval == 0
+        ? opt_value_size == sizeof(opt_value)
+            ? make_ok_result(opt_value)
+            : raw_error_result(errc::message_size)
+        : make_raw_error_result_from_errno();
 }
 
 

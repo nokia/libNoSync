@@ -38,7 +38,7 @@ full_transforming_request_handler<InReq, OutReq, InRes, OutRes>::full_transformi
     event_loop &evloop, std::shared_ptr<request_handler<OutReq, InRes>> &&base_req_handler,
     std::function<result<OutReq>(InReq)> &&req_transformer, std::function<result<OutRes>(InRes)> &&res_transformer)
     : evloop(evloop), base_req_handler(std::move(base_req_handler)),
-    req_transformer(std::move(req_transformer)), res_transformer(move(res_transformer))
+    req_transformer(std::move(req_transformer)), res_transformer(std::move(res_transformer))
 {
 }
 

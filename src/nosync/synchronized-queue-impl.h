@@ -18,7 +18,7 @@ void synchronized_queue<T>::enqueue(T element)
 {
     std::lock_guard<std::mutex> lock(elements_mutex);
     bool was_empty = elements.empty();
-    elements.push(move(element));
+    elements.push(std::move(element));
     if (was_empty) {
         elements_present_cv.notify_all();
     }
@@ -35,7 +35,7 @@ T synchronized_queue<T>::dequeue()
             return !elements.empty();
         });
 
-    auto element = move(elements.front());
+    auto element = std::move(elements.front());
     elements.pop();
 
     return element;

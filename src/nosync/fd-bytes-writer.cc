@@ -24,7 +24,7 @@ namespace
 class async_write_job : public enable_shared_from_this<async_write_job>
 {
 public:
-    static void start(fd_watching_event_loop &evloop, shared_fd &&fd, string &&data, result_handler<void> &&res_handler);
+    static void start(fd_watcher &watcher, shared_fd &&fd, string &&data, result_handler<void> &&res_handler);
 
     async_write_job(shared_fd &&fd, string &&data, result_handler<void> &&res_handler);
 
@@ -42,21 +42,21 @@ private:
 class fd_bytes_writer : public bytes_writer, public enable_shared_from_this<fd_bytes_writer>
 {
 public:
-    fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd);
+    fd_bytes_writer(fd_watcher &watcher, shared_fd &&fd);
 
     void write_bytes(string &&data, result_handler<void> &&res_handler) override;
 
 private:
-    fd_watching_event_loop &evloop;
+    fd_watcher &watcher;
     shared_fd fd;
 };
 
 
-void async_write_job::start(fd_watching_event_loop &evloop, shared_fd &&fd, string &&data, result_handler<void> &&res_handler)
+void async_write_job::start(fd_watcher &watcher, shared_fd &&fd, string &&data, result_handler<void> &&res_handler)
 {
     auto fd_num = *fd;
     auto job = make_shared<async_write_job>(move(fd), move(data), move(res_handler));
-    job->write_watch_handle = evloop.add_watch(
+    job->write_watch_handle = watcher.add_watch(
         fd_num, fd_watch_mode::output,
         [job]() {
             job->handle_write_chunk();
@@ -91,8 +91,8 @@ void async_write_job::handle_write_chunk()
 }
 
 
-fd_bytes_writer::fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd)
-    : evloop(evloop), fd(move(fd))
+fd_bytes_writer::fd_bytes_writer(fd_watcher &watcher, shared_fd &&fd)
+    : watcher(watcher), fd(move(fd))
 {
 }
 
@@ -100,15 +100,21 @@ fd_bytes_writer::fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd)
 void fd_bytes_writer::write_bytes(
     string &&data, result_handler<void> &&res_handler)
 {
-    async_write_job::start(evloop, make_copy(fd), move(data), move(res_handler));
+    async_write_job::start(watcher, make_copy(fd), move(data), move(res_handler));
 }
 
+}
+
+
+shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watcher &watcher, shared_fd &&fd)
+{
+    return make_shared<fd_bytes_writer>(watcher, move(fd));
 }
 
 
 shared_ptr<bytes_writer> make_fd_bytes_writer(fd_watching_event_loop &evloop, shared_fd &&fd)
 {
-    return make_shared<fd_bytes_writer>(evloop, move(fd));
+    return make_shared<fd_bytes_writer>(static_cast<fd_watcher &>(evloop), move(fd));
 }
 
 }

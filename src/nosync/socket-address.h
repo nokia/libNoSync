@@ -23,6 +23,7 @@ class socket_address
 public:
     virtual ~socket_address() = default;
 
+    virtual int get_address_family() const = 0;
     virtual socket_address_view get_view() const = 0;
 
 protected:

@@ -49,12 +49,12 @@ void throttling_request_handler<Req, Res>::handle_request(
     const auto now = evloop.get_etime();
     if (now >= min_allowed_req_time) {
         min_allowed_req_time = now + min_req_time_distance;
-        base_handler->handle_request(std::move(request), timeout, move(response_handler));
+        base_handler->handle_request(std::move(request), timeout, std::move(response_handler));
     } else {
         evloop.invoke_at(
             min_allowed_req_time,
-            [handler = shared_from_this(), request = std::move(request), timeout, response_handler = move(response_handler)]() mutable {
-                handler->handle_request(move(request), timeout, move(response_handler));
+            [handler = shared_from_this(), request = std::move(request), timeout, response_handler = std::move(response_handler)]() mutable {
+                handler->handle_request(std::move(request), timeout, std::move(response_handler));
             });
     }
 }
@@ -68,7 +68,7 @@ std::shared_ptr<request_handler<Req, Res>> make_throttling_request_handler(
     std::shared_ptr<request_handler<Req, Res>> &&base_handler)
 {
     return std::make_shared<throttling_request_handler_impl::throttling_request_handler<Req, Res>>(
-        evloop, min_req_time_distance, move(base_handler));
+        evloop, min_req_time_distance, std::move(base_handler));
 }
 
 }

@@ -39,6 +39,8 @@ result<std::tuple<std::unique_ptr<socket_address>, std::string>> receive_datagra
 bool is_stream_socket(int sock_fd);
 bool is_datagram_socket(int sock_fd);
 
+result<int> get_socket_int_option(int sock_fd, int level, int opt_name);
+
 result<std::string> bind_local_socket_to_auto_abstract_path(int sock_fd);
 
 result<void> connect_local_socket_to_abstract_path(int sock_fd, const std::string &abstract_path);

@@ -64,16 +64,16 @@ void read_be_numbers_fully(
 {
     read_bytes_fully(
         std::move(reader), sizeof(T) * count,
-        merge_result_handler<std::string>(
+        transform_result_handler<std::string>(
             std::move(res_handler),
-            [count](auto read_data, auto res_handler) {
+            [count](auto read_data) {
                 std::experimental::string_view bytes_view(read_data);
                 std::vector<T> res_numbers;
                 res_numbers.reserve(count);
                 for (std::size_t i = 0; i < count; ++i) {
                     res_numbers.push_back(decode_be_bytes_to_number<T>(bytes_view.substr(i * sizeof(T), sizeof(T))));
                 }
-                res_handler(make_ok_result(std::move(res_numbers)));
+                return make_ok_result(std::move(res_numbers));
             }));
 }
 
