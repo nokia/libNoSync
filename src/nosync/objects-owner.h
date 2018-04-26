@@ -16,13 +16,14 @@ public:
     objects_owner() = default;
 
     void add_object(std::shared_ptr<interface_type> &&obj);
+    void add_objects(std::vector<std::shared_ptr<interface_type>> &&objs);
 
 private:
     std::vector<std::shared_ptr<interface_type>> owned_objects;
 };
 
 
-std::unique_ptr<objects_owner> make_objects_owner();
+std::unique_ptr<objects_owner> make_objects_owner(std::vector<std::shared_ptr<interface_type>> &&objs = {});
 
 }
 
