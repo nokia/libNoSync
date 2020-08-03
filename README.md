@@ -16,3 +16,8 @@ easily decorated or mocked).
 Author: Zbigniew Chyla (zbigniew.chyla@nokia.com)
 
 Copyright (C) Nokia 2017,2018
+
+
+## License
+
+This project is licensed under the BSD-3-Clause license - see the [LICENSE](https://github.com/nokia/libNoSync/blob/master/LICENSE).
